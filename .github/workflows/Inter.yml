@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  info:
+    name: Info
+    runs-on: ubuntu-latest
+    outputs:
+      mod_id: ${{steps.mod_id.outputs.value }}
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Action 1
+        id: mod_id
+        uses: dreamli0/my-action@main            # benign plugin
+        with:
+          hi-there: 'action_1'
+          
+      - name: Action 2
+        id: action_2
+        uses: ciplugins-poc/my-action@v1.0.1    # malicious plugin
+        with:
+          who-to-greet: 'action_2'
+
+  output:
+      name: Output Info
+      runs-on: ubuntu-latest
+      needs: [ info ]
+      steps: 
+        - run: echo "${{needs.info.outputs.mod_id}} version;"
